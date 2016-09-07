@@ -2,6 +2,7 @@
 require 'csv'
 require 'awesome_print'
 require 'date'
+require 'chronic'
 
 # our namespace module
 module FarMar
@@ -24,6 +25,7 @@ require './lib/farmar_sale'
   # vendors = market.vendors
   # ap vendors
   # ap vendors[0].name
+  # ap market.products
 
 ## ---- Testing FarMar::Vendor ---- ##
   # all_vendors = FarMar::Vendor.all
@@ -32,6 +34,10 @@ require './lib/farmar_sale'
   # vendor = FarMar::Vendor.find(17)
   # ap vendor
   # ap vendor.market_id
+  # market_vendors = FarMar::Vendor.by_market(2)
+  # ap market_vendors
+
+  # ap vendor.sales
 
 ## ---- Testing FarMar::Product ---- ##
 
@@ -51,6 +57,9 @@ require './lib/farmar_sale'
   # sale = FarMar::Sale.find(17)
   # ap sale
   # ap sale.purchase_time.strftime('%c')
-  #
+
   # errortest = FarMar::Sale.find('432hjk')
   # ap errortest
+
+  # sales_between = FarMar::Sale.between(DateTime.parse("2013-11-07 08:12:16 -0800"), DateTime.parse("2013-11-07 12:33:41 -0800"))
+  # ap sales_between.length

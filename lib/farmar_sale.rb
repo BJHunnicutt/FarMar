@@ -36,4 +36,31 @@ class FarMar::Sale
     end
     return "There are no sales with that ID"
   end
+
+  # Instance Method to return the FarMar::Vendor instance that is associated with this sale
+  def vendor
+    vendor_id = self.vendor_id
+    vendor = FarMar::Vendor.find(vendor_id)
+    return vendor
+  end
+
+  # Instance Method to return the FarMar::Product instance associated with this sale
+  def product
+    product_id = self.product_id
+    product = FarMar::Product.find(product_id)
+    return product
+  end
+
+  # Class Method to return an array of FarMar::Sale objects where the purchase time is between the two times given as arguments
+  def self.between(beginning_time, end_time)
+    sales = self.all
+    sales_between = []
+    sales.each do |sale|
+      if sale.purchase_time >= beginning_time && sale.purchase_time <= end_time
+        sales_between << sale
+      end
+    end
+    return sales_between
+  end
+
 end

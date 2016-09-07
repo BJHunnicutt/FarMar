@@ -49,6 +49,31 @@ class FarMar::Market
       end
     end
   return vendors_at_market
-
   end
+
+  #Instance Method returns an array of FarMar::Product instances that are associated to the market through the FarMar::Vendor class.
+  def products
+    vendors_at_market =  self.vendors
+    products_at_market = []
+    vendors_at_market.each do |vendor|
+      products_at_market << vendor.products
+    end
+    return products_at_market.flatten
+  end
+
+  # Class Method to return a collection of FarMar::Market instances where the market name or vendor name contain the search_term.
+    # EX: FarMar::Market.search('school') would return 3 results, one being the market with id 75 (Fox School Farmers FarMar::Market).
+  # def self.search(search_term)
+  #   search_results = []
+  #   markets = self.all
+  #   markets.each do |market|
+  #     if market.name.include?(search_term) || market.name.include?(search_term)
+  #       search_results << market
+  #     end
+  #   end
+  #
+  #   return search_results
+  # end
+
+
 end
