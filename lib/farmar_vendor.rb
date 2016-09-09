@@ -60,10 +60,23 @@ class FarMar::Vendor
   end
 
   # Instance Method to return the the sum of all of the vendor's sales (in cents)
-  def revenue
-    vendor_sales = self.sales
+  #  *For a given date if a DateTime argument is passed
+  def revenue(date = nil)
     total_sales = 0
-    vendor_sales.each {|sale| total_sales += sale.amount}
+    vendor_sales = self.sales
+    if date.class == DateTime || date.class == Date # Because the Date and DateTime work fine together for what I'm doing
+      vendor_sales.each do |sale|
+        # Google tells me that === will tell you if 2 DateTime objects are on the same day...
+        if sale.purchase_time === date
+          total_sales += sale.amount
+        end
+      end
+    elsif date == nil
+      vendor_sales.each {|sale| total_sales += sale.amount}
+    else
+      raise ArgumentError.new("To search only a specific day, a DateTime input is required")
+    end
+
     return total_sales
   end
 
@@ -78,5 +91,19 @@ class FarMar::Vendor
     end
     return market_vendors
   end
+
+
+  # self.most_revenue(n) returns the top n vendor instances ranked by total revenue
+  def self.most_revenue(n)
+  end
+
+  # self.most_items(n) returns the top n vendor instances ranked by total number of items sold
+  def most_items(n)
+  end
+  
+  # self.revenue(date) returns the total revenue for that date across all vendors
+  def self.revenue(date)
+  end
+
 
 end

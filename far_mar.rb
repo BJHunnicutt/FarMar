@@ -3,6 +3,8 @@ require 'csv'
 require 'awesome_print'
 require 'date'
 require 'chronic'
+require 'benchmark'
+  # puts Benchmark.measure { -code to measure in here- }
 
 # our namespace module
 module FarMar
@@ -15,17 +17,31 @@ require './lib/farmar_product'
 require './lib/farmar_sale'
 
 
+
 ## ---- Testing FarMar::Market ---- ##
   # all_markets = FarMar::Market.all
   # ap all_markets.class
   #
-  # market = FarMar::Market.find(249)
+  market = FarMar::Market.find(249)
   # ap market.name
   #
   # vendors = market.vendors
   # ap vendors
   # ap vendors[0].name
   # ap market.products
+
+  # school_markets = FarMar::Market.search('school')
+  # ap school_markets
+
+  # ap market.preferred_vendor
+  # pref = market.preferred_vendor(DateTime.parse("2013-11-07 08:12:16 -0800"))
+  # ap "Preferred Vendor : #{pref.name}"
+  # ap pref.revenue(DateTime.parse("2013-11-07 08:12:16 -0800"))
+  # ap market.preferred_vendor("2013-11-10 08:12:16 -0800")
+
+  # worst = market.worst_vendor(DateTime.parse("2013-11-07 08:12:16 -0800"))
+  # ap "Worst Vendor : #{worst.name}"
+  # ap worst.revenue(DateTime.parse("2013-11-07 08:12:16 -0800"))
 
 ## ---- Testing FarMar::Vendor ---- ##
   # all_vendors = FarMar::Vendor.all
@@ -36,8 +52,9 @@ require './lib/farmar_sale'
   # ap vendor.market_id
   # market_vendors = FarMar::Vendor.by_market(2)
   # ap market_vendors
-
   # ap vendor.sales
+  # ap vendor.revenue(DateTime.parse("2013-11-10 08:12:16 -0800"))
+  # ap vendor.revenue("2013-11-10 08:12:16 -0800")
 
 ## ---- Testing FarMar::Product ---- ##
 

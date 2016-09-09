@@ -28,9 +28,58 @@ describe 'Testing FarMar' do
      FarMar::Market.find("780dsa890").must_equal("There are no markets with that ID")
   end
 
+              ## Optional Enhancements ##
+
   it "Must returns an array of FarMar::Product instances sold by vendors at the market" do
     market.products.must_be_instance_of(Array)
     market.products[0].must_be_instance_of(FarMar::Product)
+  end
+
+  it "Must return a collection of FarMar::Market instances where the market name or vendor name contain the search_term" do
+    school_markets = FarMar::Market.search('hills')
+    school_markets.must_be_instance_of(Array)
+    school_markets[0].name.must_equal("Scottdale Farmers Market")
+
+    # Test search more thoroughly
+    search_worked = false
+    if school_markets[0].name.downcase.include?('hills')
+      search_worked = true
+    else
+      school_markets[0].vendors.each do |vendor|
+        if vendor.name.downcase.include?('hills')
+          search_worked = true
+        end
+      end
+    end
+    search_worked.must_equal(true)
+
+  end
+
+  it "Must return the vendor with the highest revenue at that market, with the option of a specific day" do
+    market.preferred_vendor.must_be_instance_of(FarMar::Vendor)
+    market.preferred_vendor.name.must_equal("Gutmann, Toy and Ziemann")
+
+    # This is a different vendor than market.preferred_vendor without a date (above) returns
+    market.preferred_vendor(DateTime.parse("2013-11-07 08:12:16 -0800")).name.must_equal("Satterfield and Sons")
+
+    # Return nil if there's no vendors with revenue
+    market.preferred_vendor(DateTime.parse("2016-11-07 08:12:16 -0800")).must_equal(nil)
+
+    # Making sure the input is DateTime if given
+    err = ->{market.preferred_vendor("2013-11-10 08:12:16 -0800")}.must_raise(ArgumentError)
+
+    err.message.must_match(/To search only a specific day, a DateTime input is required/)
+  end
+
+  it "Must return the vendor with the lowest revenue (on a date if given)" do
+    market.worst_vendor.name.must_equal("Satterfield and Sons")
+    market.worst_vendor(DateTime.parse("2013-11-07 08:12:16 -0800")).name.must_equal("Gutmann, Toy and Ziemann")
+
+    # Making sure the input is DateTime if given
+    err = ->{market.worst_vendor("2013-11-10 08:12:16 -0800")}.must_raise(ArgumentError)
+
+    err.message.must_match(/To search only a specific day, a DateTime input is required/)
+
   end
 
 
@@ -81,7 +130,19 @@ describe 'Testing FarMar' do
     market_vendors[0].market_id.must_equal(2)
   end
 
+            ## Optional Enhancements ##
 
+  it "Must only return the revenue for a given day if a DateTime argument is passed to .revenue" do
+    vendor.revenue(DateTime.parse("2013-11-10 08:12:16 -0800")).must_be_instance_of(Fixnum)
+    vendor.revenue(DateTime.parse("2013-11-10 08:12:16 -0800")).must_equal(7803)
+
+    vendor.revenue(DateTime.parse("2016-11-10")).must_be_instance_of(Fixnum)
+    vendor.revenue(DateTime.parse("2016-11-10")).must_equal(0)
+
+    # Making sure the input is DateTime if given
+    err = ->{vendor.revenue("2013-11-10 08:12:16 -0800")}.must_raise(ArgumentError)
+    err.message.must_match(/To search only a specific day, a DateTime input is required/)
+  end
 
 ##########-------------- Testing FarMar::Product ----------------##########
   let(:product) { FarMar::Product.find(17) }
@@ -113,7 +174,7 @@ describe 'Testing FarMar' do
     product.sales[0].must_be_instance_of(FarMar::Sale)
   end
 
-  it "Must " do
+  it "Must return the number of times this product has been sold" do
     product.number_of_sales.must_be_instance_of(Fixnum)
     product.number_of_sales.must_equal(4)
   end
@@ -124,6 +185,8 @@ describe 'Testing FarMar' do
     vendor_products[0].must_be_instance_of(FarMar::Product)
     vendor_products[0].vendor_id.must_equal(2)
   end
+
+                ## Optional Enhancements ##
 
 
 ##########-------------- Testing FarMar::Sale ----------------##########
@@ -162,6 +225,8 @@ describe 'Testing FarMar' do
     sales_between[0].must_be_instance_of(FarMar::Sale)
     sales_between.length.must_equal(323)
   end
+
+              ## Optional Enhancements ##
 
 
 ##########-------------- Testing FarMar::Product ----------------##########
