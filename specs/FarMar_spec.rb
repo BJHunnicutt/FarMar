@@ -144,6 +144,36 @@ describe 'Testing FarMar' do
     err.message.must_match(/To search only a specific day, a DateTime input is required/)
   end
 
+  # NOTE: these tests TAKE 2.5 MINUTES (each) to run, so i'm commenting them unless I want it specifically
+  # it "Must return the top n vendor instances ranked by total revenue" do
+  #   top_vendors = FarMar::Vendor.most_revenue(3)
+  #   top_vendors.length.must_equal(3)
+  #   top_vendors[0].id.must_equal(2590)
+  # end
+  #
+  # it "Must return the top n vendor instances ranked by total revenue" do
+  #   top_vendors = FarMar::Vendor.most_items(3)
+  #   top_vendors.length.must_equal(3)
+  #   top_vendors[0].id.must_equal(2683)
+  # end
+  #
+  # it "Must return the total revenue for that date across all vendors" do
+  #   total_revenue = FarMar::Vendor.revenue(DateTime.parse("2013-11-07 08:12:16 -0800"))
+  #   total_revenue.must_be_instance_of(Fixnum)
+  #   total_revenue.must_equal(9060582)
+  #
+  #   # Making sure the input is DateTime if given
+  #   err = ->{FarMar::Vendor.revenue("2013-11-10 08:12:16 -0800")}.must_raise(ArgumentError)
+  #   err.message.must_match(/To search only a specific day, a DateTime input is required/)
+  # end
+  #
+  # ## This one takes 8 minutes...
+  # it "Must return the top n vendor instances ranked by total revenue" do
+  #   top_products = FarMar::Product.most_revenue(20)
+  #   top_products.length.must_equal(20)
+  #   top_products[0].id.must_equal(7848)
+  # end
+
 ##########-------------- Testing FarMar::Product ----------------##########
   let(:product) { FarMar::Product.find(17) }
 
@@ -201,8 +231,8 @@ describe 'Testing FarMar' do
   it "Must find a Sale object when given an id" do
     # sale = FarMar::Sale.find(17)
     sale.must_be_instance_of(FarMar::Sale)
-    sale.purchase_time.must_be_instance_of(DateTime)
-    sale.purchase_time.strftime('%c').must_equal("Sun Nov 10 04:16:12 2013")
+    sale.purchase_time.must_be_instance_of(String)
+    DateTime.parse(sale.purchase_time).strftime('%c').must_equal("Sun Nov 10 04:16:12 2013")
   end
 
   it "Must return a notice if asked to find an invalid ID" do

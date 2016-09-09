@@ -66,8 +66,9 @@ class FarMar::Vendor
     vendor_sales = self.sales
     if date.class == DateTime || date.class == Date # Because the Date and DateTime work fine together for what I'm doing
       vendor_sales.each do |sale|
+        sale_purchase_time = DateTime.strptime(sale.purchase_time, '%Y-%m-%d %H:%M:%S %z')
         # Google tells me that === will tell you if 2 DateTime objects are on the same day...
-        if sale.purchase_time === date
+        if sale_purchase_time === date
           total_sales += sale.amount
         end
       end
@@ -93,16 +94,66 @@ class FarMar::Vendor
   end
 
 
-  # self.most_revenue(n) returns the top n vendor instances ranked by total revenue
+  # Class Method to return the top n vendor instances ranked by total revenue
+  ### ****  This initially took 27 minutes to run!
+  ###       I spent 4 hours trying to figure out how to speed it up...
+  ###         *Main culprits:
+  ###           (1) Converting to the sale purchase time DateTime in Sale.self.all, only doing it later --> 2X faster
+  ###               * DateTime.strptime(sale.purchase_time, '%Y-%m-%d %H:%M:%S %z') is ~2x faster than DateTime.parse(sale.purchase_time) (0.5s -> 0.3s)
+  ###           (2) Reading in the CSV with CSV.foreach * IO.foreach (then line.split(",")) --> 3x faster
+
   def self.most_revenue(n)
+    all_vendors = FarMar::Vendor.all
+    all_revenues = {}
+    top_vendors_by_revenue = []
+    # "collecting revenues"
+    all_vendors.each do |vendor|
+      all_revenues[vendor] = vendor.revenue
+      print "👾 "
+    end
+    # "sorting"
+    ordered_revenues = all_revenues.sort_by{|k,v| v}  # Hash[hash.sort_by{|k,v| v}] would return a hash, but I want it ordered, so an array is better
+    # "reversing the list"
+    ordered_revenues = ordered_revenues.reverse # was arranged low-high
+    # "getting top values"
+    (0...n).each {|i| top_vendors_by_revenue << ordered_revenues[i][0]}
+    return top_vendors_by_revenue
   end
 
-  # self.most_items(n) returns the top n vendor instances ranked by total number of items sold
-  def most_items(n)
+  # Class Method to return the top n vendor instances ranked by total number of items sold
+  def self.most_items(n)
+    all_vendors = FarMar::Vendor.all
+    all_item_numbers = {}
+    top_vendors_by_item_numbers = []
+    # "collecting revenues"
+    all_vendors.each do |vendor|
+      all_item_numbers[vendor] = vendor.sales.length
+      print "🐷 "
+    end
+    # "sorting"
+    ordered_item_numbers = all_item_numbers.sort_by{|k,v| v}  # Hash[hash.sort_by{|k,v| v}] would return a hash, but I want it ordered, so an array is better
+    # "reversing the list"
+    ordered_item_numbers = ordered_item_numbers.reverse # was arranged low-high
+    # "getting top values"
+    (0...n).each {|i| top_vendors_by_item_numbers << ordered_item_numbers[i][0]}
+    return top_vendors_by_item_numbers
   end
-  
-  # self.revenue(date) returns the total revenue for that date across all vendors
+
+  # Class Method to return the total revenue for that date across all vendors
   def self.revenue(date)
+    all_vendors = FarMar::Vendor.all
+    total_revenue = 0
+
+    if date.class == DateTime || date.class == Date || date.class == nil # Because the Date and DateTime work fine together for what I'm doing
+      all_vendors.each do |vendor|
+        total_revenue += vendor.revenue(date)
+        print "🐓 "
+      end
+    else
+      raise ArgumentError.new("To search only a specific day, a DateTime input is required")
+    end
+
+    return total_revenue
   end
 
 

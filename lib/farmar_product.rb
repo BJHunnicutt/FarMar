@@ -71,6 +71,26 @@ class FarMar::Product
 
   # self.most_revenue(n) returns the top n product instances ranked by total revenue
   def self.most_revenue(n)
+    all_products = FarMar::Product.all
+    all_revenues = {}
+    top_products_by_revenue = []
+    # "collecting revenues"
+    all_products.each do |product|
+      product_sales = 0
+      product.sales.each do |sale|
+        product_sales += sale.amount
+        print "🍺 "
+      end
+        all_revenues[product] = product_sales
+        print "🍕 "
+    end
+    # "sorting"
+    ordered_revenues = all_revenues.sort_by{|k,v| v}  # Hash[hash.sort_by{|k,v| v}] would return a hash, but I want it ordered, so an array is better
+    # "reversing the list"
+    ordered_revenues = ordered_revenues.reverse # was arranged low-high
+    # "getting top values"
+    (0...n).each {|i| top_products_by_revenue << ordered_revenues[i][0]}
+    return top_products_by_revenue
   end
 
 end

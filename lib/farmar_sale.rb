@@ -12,19 +12,36 @@ class FarMar::Sale
     @product_id = sale_hash[:product_id]
   end
 
+  # ## Class Method to return a collection of instances for all objects described in the CSV
+  # def self.all_PRE_optimized
+  #   # Initialize an array that will hold objects
+  #   sales = []
+  #   # Go through each line of the csv, create an object, and add it to the array
+  #   # Using IO.foreach optimized further (0.17s --> 0.06s !!! )
+  #   CSV.foreach("support/sales.csv", "r") do |line|
+  #     # Worst way (0.5s) : sale = {id: line[0].to_i, amount: line[1].to_i, purchase_time: DateTime.parse(line[2]), vendor_id: line[3].to_i, product_id: line[4].to_i}
+  #     # ...faster (0.3s) : sale = {id: line[0].to_i, amount: line[1].to_i, purchase_time: DateTime.strptime(line[2], '%Y-%m-%d %H:%M:%S %z'), vendor_id: line[3].to_i, product_id: line[4].to_i}
+  #     # ...faster (0.17s) :
+  #     sale = {id: line[0].to_i, amount: line[1].to_i, purchase_time: line[2], vendor_id: line[3].to_i, product_id: line[4].to_i}
+  #     sales << self.new(sale)
+  #   end
+  #
+  #   return sales
+  # end
+
   ## Class Method to return a collection of instances for all objects described in the CSV
-  def self.all
-    # Initialize an array that will hold objects
+  def self.all #_optimized
     sales = []
-    # Go through each line of the csv, create an object, and add it to the array
-    CSV.foreach("support/sales.csv", "r") do |line|
-      sale = {id: line[0].to_i, amount: line[1].to_i, purchase_time: DateTime.parse(line[2]), vendor_id: line[3].to_i, product_id: line[4].to_i}
+
+    IO.foreach("support/sales.csv", "\n") do |line|
+      line = line.split(",")
+      sale = {id: line[0].to_i, amount: line[1].to_i, purchase_time: line[2], vendor_id: line[3].to_i, product_id: line[4].to_i}
       sales << self.new(sale)
     end
 
     return sales
-
   end
+
 
   ## Class Method to return an object instance for the given ID
   def self.find(id)
@@ -56,7 +73,8 @@ class FarMar::Sale
     sales = self.all
     sales_between = []
     sales.each do |sale|
-      if sale.purchase_time >= beginning_time && sale.purchase_time <= end_time
+      purchase_time = DateTime.strptime(sale.purchase_time, '%Y-%m-%d %H:%M:%S %z')
+      if purchase_time >= beginning_time && purchase_time <= end_time
         sales_between << sale
       end
     end
